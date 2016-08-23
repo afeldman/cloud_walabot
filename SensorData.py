@@ -1,6 +1,11 @@
 #!/user/bin/python
+
+from azure.servicebus import ServiceBusService
 import WalabotAPI as wala
 import json
+
+walabot_hub = 'walabot'
+debug = True
 
 class Serializer(object):
     @staticmethod
@@ -18,30 +23,31 @@ class TargetPoint:
         self.x = target.xPosCm
         self.y = target.yPosCm
         self.z = target.zPosCm
+
     def toJson(self):
         return Serializer.serialize(self)
+
     def toString(self):
         return str('Target #{}x:{}y:{}z:{}').format(self.index + 1,
                 self.x, self.y, self.z)
 
-def TargetsToAzure(targets):
+def TargetsToAzure(targets,sbs):
     for i, target in enumerate(targets):
        t = TargetPoint(i,target)
-       print(t.toJson())
+       if debug : print(t.toJson())
+       sbs.send_event(walabot_hub, t.toJson())
 
 if __name__ == "__main__":
 
-    debug = True
+    key_name = "RootManageSharedAccessKey" # SharedAccessKeyName from Azure portal
 
-    walabot_hub = 'walabot'
+    sbs = ServiceBusService(service_namespace=sn,
+                           shared_access_key_name=key_name,
+                           shared_access_key_value=key_value)
 
-#    key_name = 'RootManageSharedAccessKey' # SharedAccessKeyName from Azure portal
-#    key_value = '' # SharedAccessKey from Azure portal
-#    sbs = ServiceBusService(service_namespace,
-                #            shared_access_key_name=key_name,
-                 #           shared_access_key_value=key_value)
 
-#    sbs.create_event_hub(walabot_hub)
+
+    sbs.create_event_hub(walabot_hub)
 
     wala.Init()
     wala.SetSettingsFolder()
@@ -69,7 +75,7 @@ if __name__ == "__main__":
             if debug :print (appStatus)
             if debug :print (calibrationProcess)
 
-            TargetsToAzure(targets)
+            TargetsToAzure(targets, sbs)
         else:
             print('No Target Detected')
 

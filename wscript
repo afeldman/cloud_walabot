@@ -36,9 +36,8 @@ def configure(conf):
         conf.check_python_module('json')
     except:
         print('python module json missing')
-'''
+
 def build(bld):
     bld(features='py',
-        source=bld.path.ant_glob('src/**.py'),
+        source=bld.path.ant_glob('src/walabot/*.py'),
         install_from='.')
-'''

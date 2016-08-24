@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 class TargetPoint(Serializer):
     def __init__(self, index, target):
         Serializer.__init__(self)

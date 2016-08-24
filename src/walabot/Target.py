@@ -4,6 +4,7 @@
 class TargetPoint(Serializer):
     def __init__(self, index, target):
         Serializer.__init__(self)
+
         self.index = index
         self.x = target.xPosCm
         self.y = target.yPosCm

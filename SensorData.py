@@ -1,6 +1,10 @@
 #!/user/bin/python
 
-from azure.servicebus import ServiceBusService
+
+import iothub_client
+from iothub_client import *
+from iothub_client_args import *
+
 import WalabotAPI as wala
 import json
 

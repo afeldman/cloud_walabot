@@ -5,11 +5,7 @@ import iothub_client
 from iothub_client import *
 from iothub_client_args import *
 
-import WalabotAPI as wala
-import json
-
 walabot_hub = 'walabot'
-debug = True
 
 class Serializer(object):
     @staticmethod

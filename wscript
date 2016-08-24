@@ -8,19 +8,24 @@ def configure(conf):
     conf.check_python_version((2,7,0))
 
     try:
-        conf.check_python_module('azure')
+        conf.check_python_module('posix_ipc')
     except:
-        print('python module azure missing')
+        print('python module posix_ipc missing')
 
     try:
-        conf.check_python_module('socket')
+        conf.check_python_module('mmap')
     except:
-        print('python module socket missing')
+        print('python module mmap missing')
 
     try:
         conf.check_python_module('sys')
     except:
         print('python module sys missing')
+
+    try:
+        conf.check_python_module('time')
+    except:
+        print('python module time missing')
 
     try:
         conf.check_python_module('WalabotAPI')

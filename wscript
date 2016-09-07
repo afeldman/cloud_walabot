@@ -1,41 +1,61 @@
+#!/usr/bin/env python
+# encoding: utf-8
+# waf script for builduing project
+# author: Anton Feldmann
+# Copyright 2014 anton.feldmann@gmail.com
+# license: MIT
+
+import os, sys
+from waflib import Build, TaskGen
+
+name = 'robcon'
+
+major  = 0
+minor  = 1
+bugfix = 0
+
+name_version = '%s-%d.%d.%d' % (name, major, minor, bugfix)
+
+application = name
+version     = '%d.%d.%d' % (major, minor, bugfix)
+
 top = '.'
+out = 'build'
 
 def options(opt):
-    opt.load('python')
+    opt.load('compiler_cxx boost compiler_c')
+
+    #Add configuration options in python
+    walaopt = opt.add_option_group ("%s Options" % name.upper())
+
+    walaopt.add_option('--shared',
+                      action='store_true',
+                      default=False,
+                      help='build all libs as shared libs')
+    walaopt.add_option('--clang',
+                      action='store_true',
+                      default=False,
+                      help='build with clang')
+    waladebugopt = opt.add_option_group ("%s_Debugging Options" % name.upper())
+
+    daladebugopt.add_option('--debug',
+                            action='store_true',
+                            default=False,
+                            help='compile the project in debug mode')
 
 def configure(conf):
-    conf.load('python')
-    conf.check_python_version((2,7,0))
+    env=conf.env
+    opt=conf.options
 
-    try:
-        conf.check_python_module('posix_ipc')
-    except:
-        print('python module posix_ipc missing')
+    from waflib import Options
 
-    try:
-        conf.check_python_module('mmap')
-    except:
-        print('python module mmap missing')
+    opts = Options.options
 
-    try:
-        conf.check_python_module('sys')
-    except:
-        print('python module sys missing')
+    if not os.name == 'nt':
+        if(opts.clang):
+            env.CXX = 'clang++'
+            env.CC = 'clang'
 
-    try:
-        conf.check_python_module('time')
-    except:
-        print('python module time missing')
-
-    try:
-        conf.check_python_module('WalabotAPI')
-    except:
-        print('python module WalabotAPI missing')
-
-    try:
-        conf.check_python_module('json')
-    except:
-        print('python module json missing')
 
 def build(bld):
     bld(features='py',

@@ -5,10 +5,9 @@
  */
 #pragma once
 
-#include <memory>
 #include <WalabotAPI.h>
 
-#include "walabottypes"
+#include <memory>
 
 /*!\brief walabot Namespace
  *\namespace libWalabot
@@ -20,12 +19,10 @@ namespace libWalabot{
     Walabot();
     ~Walabot();
 
-    boolean start();
-    boolean stop();
+    bool start();
+    bool stop();
     void connect();
     double calibrate();
-  private:
-    shared_memory<SensorTarget> m_sensortarget;
   };
 
 }

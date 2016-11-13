@@ -5,6 +5,11 @@
  */
 #pragma once
 
+#include <array>
+#include <memory>
+#include <mutex>
+using namespace std;
+
 #include <cstdint>
 #include <WalabotAPI.h>
 
@@ -29,3 +34,44 @@
       return;                                                         \
     }                                                                 \
   }
+
+namespace Walabot{
+
+  class Area{
+  public:
+    Area();
+    explicit Area(double min_radialdistance,
+                  double max_radialdistance,
+                  double resolution_radialdistance,
+                  double min_altitude,
+                  double max_altitude,
+                  double resolutionn_altitude,
+                  double min_azimuth,
+                  double max_azimuth,
+                  double resolution_azimuth);
+    virtual ~Area();
+
+    array<double,3>& radialDistance(void);
+    array<double,3>& altitude(void);
+    array<double,3>& azimuth(void);
+
+    void setRadialDistance(double min,
+                           double max,
+                           double res);
+    void setAltitude(double min,
+                     double max,
+                     double res);
+    void setAzimuth(double min,
+                    double max,
+                    double res);
+  private:
+    array<double,3> radialDistance;
+    array<double,3> altitude;
+    array<double,3> azimuth;
+
+    mutex m_lock;
+  };
+
+
+
+}

@@ -7,8 +7,6 @@
 
 #include <WalabotAPI.h>
 
-#include <memory>
-
 /*!\brief walabot Namespace
  *\namespace libWalabot
  */
@@ -19,10 +17,13 @@ namespace libWalabot{
     Walabot();
     ~Walabot();
 
-    bool start();
-    bool stop();
-    void connect();
-    double calibrate();
+  private:
+    WALABOT_RESULT init();
+    WALABOT_RESULT shutdown();
+
+  private:
+    bool connected;
+    bool mtimode;
   };
 
 }

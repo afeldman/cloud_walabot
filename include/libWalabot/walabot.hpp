@@ -15,13 +15,15 @@ namespace libWalabot{
   class Walabot{
   public:
     Walabot();
-    ~Walabot();
+    virtual ~Walabot();
 
   private:
-    WALABOT_RESULT init();
-    WALABOT_RESULT shutdown();
+    void init();
 
   private:
+    WALABOT_RESULT walabot_result;
+    APP_STATUS walabot_status;
+
     bool connected;
     bool mtimode;
   };

@@ -8,7 +8,7 @@
 import os, sys
 from waflib import Build, TaskGen
 
-name = 'robcon'
+name = 'libwalabot'
 
 major  = 0
 minor  = 1
@@ -37,13 +37,14 @@ def options(opt):
                       default=False,
                       help='build with clang')
     waladebugopt = opt.add_option_group ("%s_Debugging Options" % name.upper())
-
-    daladebugopt.add_option('--debug',
+    waladebugopt.add_option('--debug',
                             action='store_true',
                             default=False,
                             help='compile the project in debug mode')
 
 def configure(conf):
+    conf.load('compiler_c compiler_cxx')
+
     env=conf.env
     opt=conf.options
 
@@ -58,6 +59,44 @@ def configure(conf):
 
 
 def build(bld):
-    bld(features='py',
-        source=bld.path.ant_glob('src/walabot/*.py'),
-        install_from='.')
+
+    bld.install_files('${PREFIX}/include/libwalabot/',
+                      bld.path.ant_glob(['include/libwalabot/*.hpp'],
+                                        remove=False))
+
+    libwalabot=bld(
+        features     = ['cxx'],
+        target       = 'libWalabot',
+        cxxflags     = ['-Wall','-std=c++11'],
+        source       = bld.path.ant_glob(['*.cpp']),
+        includes     = ['include/libWalabot/'],
+        install_path = '${PREFIX}/lib',
+        use          = []
+    )
+
+    from waflib import Options
+    if Options.options.debug:
+        libwalabot.cxxflags.append(['-g', '-O0'])
+    else:
+        libwalabot.cxxflags.append('-O3')
+
+    if Options.options.clang:
+        libwalabot.cxxflags.append('-stdlib=libstdc++')
+
+    libwalabot.features.append('cxxshlib' if Options.options.shared else 'cxxstlib')
+
+    # process libwalabot.pc.in -> libwalabot.pc - by default it use the task "env" attribute
+    pcf = bld(
+        features = 'subst',
+        source = '%s.pc.in' % name,
+        target = '%s.pc' % name,
+        install_path = '${PREFIX}/lib/pkgconfig/'
+        )
+
+    pcf.env.table.update(
+        {'LIBS':'',
+         'VERSION': version,
+         'NAME': name,
+         'PREFIX': '%s' % Options.options.prefix,
+         'INCLUDEDIR': 'include/%s' % name}
+        )

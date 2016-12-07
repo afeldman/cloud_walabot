@@ -69,6 +69,23 @@ Walabot::Walabot(): walabot_result(WALABOT_ERR_USB_READ_FAILURE),
   this->init();
 }
 
+Walabot::~Walabot(){
+  //stop walabot
+  this->walabot_result = Walabot_Stop();
+  assert(this->walabot_result == WALABOT_SUCCESS);
+
+  //walabot disconnect
+  if(this->connected){
+    this->walabot_result = Walabot_Disconnect();
+  }
+
+  this->calibrationProcess = 0.0;
+
+  this->connected = false;
+
+  this->mtimode = false;
+}
+
 WalabotTarget::WalabotTarget(double x,
                              double y,
                              double z,

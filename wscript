@@ -75,10 +75,6 @@ def configure(conf):
 
 def build(bld):
 
-    bld.install_files('${PREFIX}/include/libwalabot/',
-                      bld.path.ant_glob(['include/libwalabot/*.hpp'],
-                                        remove=False))
-
     libwalabot=bld(
         features     = ['cxx'],
         target       = name,
@@ -101,7 +97,20 @@ def build(bld):
 
     libwalabot.features.append('cxxshlib' if (Options.options.shared or Options.options.scripting) else 'cxxstlib')
 
+    bld.install_files('${PREFIX}/include/libwalabot/',
+                      bld.path.ant_glob(['include/libwalabot/*.hpp'],
+                                        remove=False))
+
     # use swig_flags = '-c++ -python -debug-classes' for debugging
+    bld(
+	features = 'cxx cxxshlib pyext',
+	source = 'script/libWalabot.i',
+	target = 'script/libWalabot',
+        cxxflags = ['-Wall','-std=c++11'],
+	swig_flags = '-c++ -python -Wall',
+	includes = ['include/libWalabot/'],
+	vnum = version,
+	use  = 'mylib')
 
 
     # process libwalabot.pc.in -> libwalabot.pc - by default it use the task "env" attribute

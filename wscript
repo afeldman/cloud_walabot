@@ -8,7 +8,7 @@
 import os, sys
 from waflib import Build, TaskGen
 
-name = 'libwalabot'
+name = 'walabot'
 
 major  = 0
 minor  = 1
@@ -23,7 +23,7 @@ top = '.'
 out = 'build'
 
 def options(opt):
-    opt.load('compiler_cxx compiler_c python')
+    opt.load('compiler_cxx compiler_c swig lua java ruby python')
 
     #Add configuration options in python
     walaopt = opt.add_option_group ("%s Options" % name.upper())
@@ -43,15 +43,11 @@ def options(opt):
                             help='compile the project in debug mode')
 
     walascriptopt = opt.add_option_group ("%s_Scripting Options" % name.upper())
-    walascriptopt.add_option('--python',
+    waladebugopt.add_option('--scripting',
                             action='store_true',
-                            default=False,
-                            help='compile the project with a python interface')
+                            default=True,
+                            help='compile the project with the scripting interface')
 
-    walascriptopt.add_option('--lua',
-                            action='store_true',
-                            default=False,
-                            help='compile the project with a lua interface')
 def configure(conf):
 
     env=conf.env
@@ -64,20 +60,18 @@ def configure(conf):
             env.CXX = 'clang++'
             env.CC = 'clang'
 
-    conf.load('compiler_c compiler_cxx')
+    conf.load('compiler_cxx compiler_c')
 
-    conf.load('swig')
-    if conf.check_swig_version() < (1, 2, 27):
-        conf.fatal('this swig version is too old')
+    if Options.options.scripting:
+        conf.load('lua ruby swig java python')
 
-    if Options.options.lua:
-        conf.load('lua')
+        #check python version
+        conf.check_python_version((2,7,0))
+        conf.check_python_headers()
 
-    if Options.options.python:
-        conf.load('python')
-	conf.check_python_version((2,7,0))
-	conf.check_python_headers()
-
+        # check for ruby
+        conf.check_ruby_version((1,8,0))
+        conf.check_ruby_ext_devel()
 
 def build(bld):
 
@@ -87,11 +81,12 @@ def build(bld):
 
     libwalabot=bld(
         features     = ['cxx'],
-        target       = 'libWalabot',
+        target       = name,
         cxxflags     = ['-Wall','-std=c++11'],
         source       = bld.path.ant_glob(['src/*.cpp']),
         includes     = ['include/libWalabot/'],
         install_path = '${PREFIX}/lib',
+        vnum         = version,
         use          = []
     )
 
@@ -104,9 +99,9 @@ def build(bld):
     if Options.options.clang:
         libwalabot.cxxflags.append('-stdlib=libstdc++')
 
-    libwalabot.features.append('cxxshlib' if Options.options.shared else 'cxxstlib')
+    libwalabot.features.append('cxxshlib' if (Options.options.shared or Options.options.scripting) else 'cxxstlib')
 
-#    if Options.options.python:
+    # use swig_flags = '-c++ -python -debug-classes' for debugging
 
 
     # process libwalabot.pc.in -> libwalabot.pc - by default it use the task "env" attribute

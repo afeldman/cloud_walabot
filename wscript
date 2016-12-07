@@ -95,7 +95,7 @@ def build(bld):
     if Options.options.clang:
         libwalabot.cxxflags.append('-stdlib=libstdc++')
 
-    libwalabot.features.append('cxxshlib' if (Options.options.shared or Options.options.scripting) else 'cxxstlib')
+    libwalabot.features.append('cxxshlib' if Options.options.shared else 'cxxstlib')
 
     bld.install_files('${PREFIX}/include/libwalabot/',
                       bld.path.ant_glob(['include/libwalabot/*.hpp'],
@@ -105,13 +105,32 @@ def build(bld):
     bld(
 	features = 'cxx cxxshlib pyext',
 	source = 'script/libWalabot.i',
-	target = 'script/libWalabot',
+	target = 'script/libWalabot/python',
         cxxflags = ['-Wall','-std=c++11'],
 	swig_flags = '-c++ -python -Wall',
 	includes = ['include/libWalabot/'],
 	vnum = version,
 	use  = 'mylib')
 
+    bld(
+	features = 'cxx cxxshlib rubyext',
+	source = 'script/libWalabot.i',
+	target = 'script/libWalabot/ruby',
+        cxxflags = ['-Wall','-std=c++11'],
+	swig_flags = '-c++ -ruby -Wall',
+	includes = ['include/libWalabot/'],
+	vnum = version,
+	use  = 'mylib')
+
+    bld(
+	features = 'cxx cxxshlib',
+	source = 'script/libWalabot.i',
+	target = 'script/libWalabot/lua',
+        cxxflags = ['-Wall','-std=c++11'],
+	swig_flags = '-c++ -lua -Wall',
+	includes = ['include/libWalabot/'],
+	vnum = version,
+	use  = 'mylib')
 
     # process libwalabot.pc.in -> libwalabot.pc - by default it use the task "env" attribute
     pcf = bld(

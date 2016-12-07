@@ -34,7 +34,7 @@ def options(opt):
                       help='build all libs as shared libs')
     walaopt.add_option('--clang',
                       action='store_true',
-                      default=False,
+                      default=True,
                       help='build with clang')
     waladebugopt = opt.add_option_group ("%s_Debugging Options" % name.upper())
     waladebugopt.add_option('--debug',
@@ -43,20 +43,19 @@ def options(opt):
                             help='compile the project in debug mode')
 
 def configure(conf):
-    conf.load('compiler_c compiler_cxx')
 
     env=conf.env
     opt=conf.options
 
     from waflib import Options
 
-    opts = Options.options
-
     if not os.name == 'nt':
-        if(opts.clang):
+        print(Options.options.clang)
+        if Options.options.clang:
             env.CXX = 'clang++'
             env.CC = 'clang'
 
+    conf.load('compiler_c boost compiler_cxx')
 
 def build(bld):
 
@@ -68,7 +67,7 @@ def build(bld):
         features     = ['cxx'],
         target       = 'libWalabot',
         cxxflags     = ['-Wall','-std=c++11'],
-        source       = bld.path.ant_glob(['*.cpp']),
+        source       = bld.path.ant_glob(['src/*.cpp']),
         includes     = ['include/libWalabot/'],
         install_path = '${PREFIX}/lib',
         use          = []

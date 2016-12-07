@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <array>
 #include <WalabotAPI.h>
 
 /*!\brief walabot Namespace
@@ -12,10 +13,44 @@
  */
 namespace libWalabot{
 
+  class WalabotTarget{
+  public:
+    explicit WalabotTarget(double x=0.0,
+                  double y=0.0,
+                  double z=0.0,
+                  double ampl=0.0);
+    virtual ~WalabotTarget(){}
+  public:
+    double x;
+    double y;
+    double z;
+    double ampl;
+  };
+
   class Walabot{
   public:
     Walabot();
-    virtual ~Walabot();
+    virtual ~Walabot(){
+      //stop walabot
+      this->walabot_result = Walabot_Stop();
+      assert(this->walabot_result == WALABOT_SUCCESS);
+
+      //walabot disconnect
+      if(this->connected){
+        this->walabot_result = Walabot_Disconnect();
+      }
+
+      this->calibrationProcess = 0.0;
+
+      this->connected = false;
+
+      this->mtimode = false;
+    }
+
+    void runTargetFinder();
+
+    WalabotTarget &getTarget(int i);
+    WalabotTarget &getTargets();
 
   private:
     void init();
@@ -24,8 +59,12 @@ namespace libWalabot{
     WALABOT_RESULT walabot_result;
     APP_STATUS walabot_status;
 
+    double calibrationProcess;
+
     bool connected;
     bool mtimode;
+
+    std::array<WalabotTarget,10> m_walabotTargets;
   };
 
 }

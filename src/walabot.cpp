@@ -106,7 +106,8 @@ void Walabot::runTargetFinder(){
   //copy object
   WalabotTarget t(0.0,0.0,0.0,0.0);
 
-  for (unsigned int i = 0; ((i < this->m_walabotTargets.size())||(i > numTargets)); ++i ){
+  for (unsigned int i = 0; ((i < this->m_walabotTargets.size())||
+                            (i > numTargets)); ++i ){
 
     //deep copy to object
     t.x = targets[i].xPosCm;

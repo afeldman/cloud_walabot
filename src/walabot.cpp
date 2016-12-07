@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <memory>
 
 #include <walabot.hpp>
 
@@ -84,6 +85,30 @@ Walabot::~Walabot(){
   this->connected = false;
 
   this->mtimode = false;
+}
+
+void Walabot::runTargetFinder(){
+  SensorTarget *targets;
+  int numTargets;
+
+  // Trigger the Walabot Sensor
+  //  ====================================================================
+  this->walabot_result = Walabot_Trigger();
+  assert(this->walabot_result == WALABOT_SUCCESS);
+
+  lock_guard<std::mutex> lock(targetlock);
+
+  // get sensordata
+  this->walabot_result = Walabot_GetSensorTargets(&targets, &numTargets);
+  assert(this->walabot_result == WALABOT_SUCCESS);
+
+  shared_ptr<WalabotTarget> t(new WalabotTarget());
+
+  for (unsigned int i = 0; i < this->m_walabotTargets.size(); ++i ){
+    if (i > numTargets)
+    t->x =
+      this->m_walabotTargets[i] = t;
+  }
 }
 
 WalabotTarget::WalabotTarget(double x,

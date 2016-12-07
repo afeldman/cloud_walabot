@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <mutex>          // std::mutex, std::lock_guard
 #include <array>
 #include <WalabotAPI.h>
 
@@ -34,9 +35,6 @@ namespace libWalabot{
 
     void runTargetFinder();
 
-    WalabotTarget &getTarget(int i);
-    WalabotTarget &getTargets();
-
   private:
     void init();
 
@@ -48,7 +46,8 @@ namespace libWalabot{
 
     bool connected;
     bool mtimode;
-
+    std::mutex targetlock;
+  public:
     std::array<WalabotTarget,10> m_walabotTargets;
   };
 

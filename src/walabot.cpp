@@ -97,26 +97,19 @@ void Walabot::runTargetFinder(){
   assert(this->walabot_result == WALABOT_SUCCESS);
 
   //lock access to sensordata for reading
-  lock_guard<std::mutex> lock(targetlock);
+  lock_guard<std::mutex> lock(this->targetlock);
 
   // get sensordata
   this->walabot_result = Walabot_GetSensorTargets(&targets, &numTargets);
   assert(this->walabot_result == WALABOT_SUCCESS);
 
-  //copy object
-  WalabotTarget t(0.0,0.0,0.0,0.0);
-
-  for (unsigned int i = 0; ((i < this->m_walabotTargets.size())||
-                            (i > numTargets)); ++i ){
-
-    //deep copy to object
-    t.x = targets[i].xPosCm;
-    t.y = targets[i].yPosCm;
-    t.z = targets[i].zPosCm;
-    t.ampl = targets[i].amplitude;
-
+  for (unsigned int i = 0; ((i < this->m_walabotTargets.size()) &&
+                            (i < numTargets)); ++i ){
     //copy object to array
-    this->m_walabotTargets[i] = t;
+    this->m_walabotTargets[i].x = targets[i].xPosCm;
+    this->m_walabotTargets[i].y = targets[i].yPosCm;
+    this->m_walabotTargets[i].z = targets[i].zPosCm;
+    this->m_walabotTargets[i].ampl = targets[i].amplitude;
   }
 
 }
